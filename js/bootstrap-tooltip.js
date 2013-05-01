@@ -125,9 +125,12 @@
         , actualHeight
         , placement
         , tp
+        , scroll
         , topPos
         , arrowOffset
         , e = $.Event('show')
+
+      scroll = $(window).scrollTop()
 
       if (this.hasContent() && this.enabled) {
         this.$element.trigger(e)
@@ -185,25 +188,29 @@
             break
           case 'left':
             topPos = pos.top + pos.height / 2 - actualHeight / 2
-            if (window.innerHeight < topPos - scroll + actualHeight) {
-              arrowOffset = ((topPos - scroll + actualHeight) - window.innerHeight + 10)
-              topPos -= arrowOffset
-            }
-            else if (topPos - scroll < 0) {
-              arrowOffset = (topPos - scroll - 10)
-              topPos -= arrowOffset
+            if (this.options.dynamicPos) {
+              if (window.innerHeight < topPos - scroll + actualHeight) {
+                arrowOffset = ((topPos - scroll + actualHeight) - window.innerHeight + 10)
+                topPos -= arrowOffset
+              }
+              else if (topPos - scroll < 0) {
+                arrowOffset = (topPos - scroll - 10)
+                topPos -= arrowOffset
+              }
             }
             tp = {top: topPos, left: pos.left - actualWidth}
             break
           case 'right':
             topPos = pos.top + pos.height / 2 - actualHeight / 2
-            if (window.innerHeight < topPos - scroll + actualHeight) {
-              arrowOffset = ((topPos - scroll + actualHeight) - window.innerHeight + 10)
-              topPos -= arrowOffset
-            }
-            else if (topPos - scroll < 0) {
-              arrowOffset = (topPos - scroll - 10)
-              topPos -= arrowOffset
+            if (this.options.dynamicPos) {
+              if (window.innerHeight < topPos - scroll + actualHeight) {
+                arrowOffset = ((topPos - scroll + actualHeight) - window.innerHeight + 10)
+                topPos -= arrowOffset
+              }
+              else if (topPos - scroll < 0) {
+                arrowOffset = (topPos - scroll - 10)
+                topPos -= arrowOffset
+              }
             }
             tp = {top: topPos, left: pos.left + pos.width}
             break
