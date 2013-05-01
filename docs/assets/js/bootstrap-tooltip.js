@@ -125,6 +125,8 @@
         , actualHeight
         , placement
         , tp
+        , topPos
+        , arrowOffset
         , e = $.Event('show')
 
       if (this.hasContent() && this.enabled) {
@@ -152,17 +154,17 @@
 
         actualWidth = $tip[0].offsetWidth
         actualHeight = $tip[0].offsetHeight
-    
+
         if (this.options.dynamicPos) {
-    
+
           doc = document.documentElement
           body = document.body
           top = (doc && doc.scrollTop || body && body.scrollTop || 0)
-    
+
           conWidth = this.options.container == 'body' ? window.innerWidth : this.$element.parent().outerWidth()
           conHeight = this.options.container == 'body' ? window.innerHeight : this.$element.parent().outerHeight()
           conLeft = this.options.container == 'body' ? 0 : conPos.left
-    
+
           if (placement == 'right' && (pos.right + actualWidth > conWidth))
             placement = 'left'
           else if (placement == 'left' && (pos.left - actualWidth < conLeft))
@@ -182,19 +184,37 @@
             tp = {top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2}
             break
           case 'left':
-            tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth}
+            topPos = pos.top + pos.height / 2 - actualHeight / 2
+            if (window.innerHeight < topPos - scroll + actualHeight) {
+              arrowOffset = ((topPos - scroll + actualHeight) - window.innerHeight + 10)
+              topPos -= arrowOffset
+            }
+            else if (topPos - scroll < 0) {
+              arrowOffset = (topPos - scroll - 10)
+              topPos -= arrowOffset
+            }
+            tp = {top: topPos, left: pos.left - actualWidth}
             break
           case 'right':
-            tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width}
+            topPos = pos.top + pos.height / 2 - actualHeight / 2
+            if (window.innerHeight < topPos - scroll + actualHeight) {
+              arrowOffset = ((topPos - scroll + actualHeight) - window.innerHeight + 10)
+              topPos -= arrowOffset
+            }
+            else if (topPos - scroll < 0) {
+              arrowOffset = (topPos - scroll - 10)
+              topPos -= arrowOffset
+            }
+            tp = {top: topPos, left: pos.left + pos.width}
             break
         }
 
-        this.applyPlacement(tp, placement)
+        this.applyPlacement(tp, placement, arrowOffset)
         this.$element.trigger('shown')
       }
     }
 
-  , applyPlacement: function(offset, placement){
+  , applyPlacement: function(offset, placement, arrowOffset){
       var $tip = this.tip()
         , width = $tip[0].offsetWidth
         , height = $tip[0].offsetHeight
@@ -216,7 +236,15 @@
         replace = true
       }
 
-      if (placement == 'bottom' || placement == 'top') {
+      if (typeof arrowOffset !== 'undefined' && arrowOffset !== null){
+        if(this.$element.offset().top < $tip.offset().top)
+          $tip.offset({ top: $tip.offset().top - 20 })
+        if(this.$element.offset().top + this.arrow().outerHeight() > $tip.offset().top + actualHeight)
+          $tip.offset({ top: $tip.offset().top + 20 })
+        this.arrow().css({ position: 'absolute' })
+        this.arrow().offset({ top: this.$element.offset().top })
+      }
+      else if (placement == 'bottom' || placement == 'top') {
         delta = 0
 
         if (offset.left < 0){

@@ -71,6 +71,10 @@
       return this.$tip
     }
 
+  , arrow: function(){
+      return this.$arrow = this.$arrow || this.tip().find(".arrow")
+    }
+
   , destroy: function () {
       this.hide().$element.off('.' + this.type).removeData(this.type)
     }
